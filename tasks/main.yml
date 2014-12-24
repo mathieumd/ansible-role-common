@@ -1,0 +1,104 @@
+---
+# tasks file for common
+# vim: ft=ansible
+
+#######################################################################
+# Base packages
+#######################################################################
+
+- name: Make sure base packages are installed
+  sudo: yes
+  # Update cache if older than 1 day
+  apt: name={{ item }} state=latest update_cache=yes cache_valid_time=86400
+  with_items:
+    - ntp
+    - tzdata
+    - vim
+    - screen
+    - htop
+    - git
+  tags: packages
+
+#######################################################################
+# Locale
+#######################################################################
+
+- name: Make sure wanted locales are present
+  sudo: yes
+  locale_gen: name="{{ item }}" state=present
+  with_items: "{{ locale | default('en_US.UTF-8') }}"
+  tags: locale
+
+- name: Set default Locale and Language
+  sudo: yes
+  lineinfile: line='export {{ item[0] }}="{{ item[1] }}"'
+              regexp='^export {{ item[0] }}='
+              dest=/etc/profile
+              state=present create=yes
+  with_nested:
+    - [ 'LC_ALL', 'LANG' ]
+    - "{{ locale | default('en_US.UTF-8') }}"
+  tags: locale
+
+#######################################################################
+# NTP
+#######################################################################
+
+- name: be sure ntp is running and enabled
+  sudo: yes
+  service: name=ntp state=running enabled=yes
+  tags: time
+
+#######################################################################
+# UTC Timezone
+#######################################################################
+
+- name: Set timezone
+  sudo: yes
+  lineinfile: line='{{ timezone | default('Etc/UTC') }}'
+              regexp='^.*$'
+              dest=/etc/timezone
+              state=present create=yes
+  notify: reconfigure tzdata
+  tags: time
+
+#######################################################################
+# Liquidprompt
+#######################################################################
+
+- name: Checkout Liquidprompt from Github
+  sudo: yes
+  git: repo=https://github.com/nojhan/liquidprompt.git
+       dest=/opt/liquidprompt
+  tags: liquidprompt
+
+# Current user
+- name: Enable Liquidprompt (for current user)
+  lineinfile: line="source /opt/liquidprompt/liquidprompt"
+              dest="~/.bashrc"
+              state=present
+  tags: liquidprompt
+
+- name: Configure Liquidprompt (for current user)
+  copy: src="{{ item }}" dest="~/.{{ item }}"
+  with_items:
+    - liquidpromptrc
+    - liquid.theme
+  tags: liquidprompt
+
+# Root user (through sudo)
+- name: Enable Liquidprompt (for root user)
+  sudo: yes
+  lineinfile: line="source /opt/liquidprompt/liquidprompt"
+              dest="~/.bashrc"
+              state=present
+  tags: liquidprompt
+
+- name: Configure Liquidprompt (for root user)
+  sudo: yes
+  copy: src="{{ item }}" dest="~/.{{ item }}"
+  with_items:
+    - liquidpromptrc
+    - liquid.theme
+  tags: liquidprompt
+

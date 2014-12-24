@@ -1,0 +1,10 @@
+---
+# handlers file for common
+# vim: ft=ansible
+
+- name: restart ntp
+  service: name=ntp state=restarted
+
+- name: reconfigure tzdata
+  command: 'dpkg-reconfigure -f noninteractive tzdata'
+

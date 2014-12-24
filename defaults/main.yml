@@ -1,0 +1,13 @@
+---
+# defaults file for common
+# vim: ft=ansible
+
+# List of locales wanted
+locale:
+  - 'en_US.UTF-8'
+  - 'fr_FR.UTF-8'
+
+# The default timezone of the system
+timezone: 'Etc/UTC'
+
+
