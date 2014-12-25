@@ -37,7 +37,7 @@
               state=present create=yes
   with_nested:
     - [ 'LC_ALL', 'LANG' ]
-    - "{{ locale | default('en_US.UTF-8') }}"
+    - "{{ locale[0] | default('en_US.UTF-8') }}"
   tags: locale
 
 #######################################################################
