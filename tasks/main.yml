@@ -75,11 +75,31 @@
 - name: Checkout Vundle from Github
   git: repo=https://github.com/gmarik/Vundle.vim.git
        dest="~/.vim/bundle/Vundle.vim"
+  when: vim_vundle == true
 
 - name: Vim configuration
   lineinfile: dest="~/.vimrc" state=present line="{{ item }}" create=yes
   with_items:
     - "set nocompatible"
+    - "set hlsearch"
+    - "set ignorecase"
+    - "set smarcase"
+    - "set showmatch"
+    - "set number"
+    - "set list"
+    - "set smartindent"
+    - "set tabstop=4"
+    - "set softtabstop=4"
+    - "set shiftwidth=4"
+    - "set exapandtab"
+    - "set autoindent"
+    - "set nojoinspaces"
+    - "set mouse=a"
+    - "set hidden"
+
+- name: Vim Vundle configuration
+  lineinfile: dest="~/.vimrc" state=present line="{{ item }}" create=yes
+  with_items:
     - "filetype off"
     - "set rtp+=~/.vim/bundle/Vundle.vim"
     - "call vundle#begin()"
@@ -87,13 +107,12 @@
     - "Plugin 'tpope/vim-sensible'"
     - "call vundle#end()"
     - "filetype plugin indent on"
-    - "set showmatch"
-    - "set hls"
-    - "set ic"
+  when: vim_vundle == true
 
 - name: Vim install plugins
   command: vim +PluginInstall +qall
   changed_when: false
+  when: vim_vundle == true
 
 #=====================================================================
 # Liquidprompt
@@ -103,6 +122,7 @@
   sudo: yes
   git: repo=https://github.com/nojhan/liquidprompt.git
        dest=/opt/liquidprompt
+  when: liquidprompt == true
   tags: liquidprompt
 
 # Current user
@@ -110,6 +130,7 @@
   lineinfile: line="source /opt/liquidprompt/liquidprompt"
               dest="~/.bashrc"
               state=present
+  when: liquidprompt == true
   tags: liquidprompt
 
 - name: Configure Liquidprompt (for current user)
@@ -117,6 +138,7 @@
   with_items:
     - liquidpromptrc
     - liquid.theme
+  when: liquidprompt == true
   tags: liquidprompt
 
 # Root user (through sudo)
@@ -125,6 +147,7 @@
   lineinfile: line="source /opt/liquidprompt/liquidprompt"
               dest="~/.bashrc"
               state=present
+  when: liquidprompt == true
   tags: liquidprompt
 
 - name: Configure Liquidprompt (for root user)
@@ -133,6 +156,7 @@
   with_items:
     - liquidpromptrc
     - liquid.theme
+  when: liquidprompt == true
   tags: liquidprompt
 
 # vim: ft=ansible

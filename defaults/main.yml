@@ -1,6 +1,5 @@
 ---
 # defaults file for common
-# vim: ft=ansible
 
 # List of locales wanted
 locale:
@@ -10,4 +9,10 @@ locale:
 # The default timezone of the system
 timezone: 'Etc/UTC'
 
+# Shall we setup Vim's Vundle?
+vim_vundle: false
 
+# Shall we setup Liquidprompt?
+liquidprompt: true
+
+# vim: ft=ansible
