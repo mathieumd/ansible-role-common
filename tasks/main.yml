@@ -28,6 +28,7 @@
   with_items: "{{ locale | default('en_US.UTF-8') }}"
   tags: locale
 
+# FIXME "locale[0]" would be "e" (for "en_US") if variable is not a list!
 - name: Set default Locale and Language
   sudo: yes
   lineinfile: line='export {{ item[0] }}="{{ item[1] }}"'

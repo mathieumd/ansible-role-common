@@ -3,8 +3,10 @@
 # vim: ft=ansible
 
 - name: restart ntp
+  sudo: yes
   service: name=ntp state=restarted
 
 - name: reconfigure tzdata
-  command: 'dpkg-reconfigure -f noninteractive tzdata'
+  sudo: yes
+  command: dpkg-reconfigure -f noninteractive tzdata
 
