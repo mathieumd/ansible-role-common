@@ -6,7 +6,6 @@
 ######################################################################
 
 - name: Make sure base packages are installed
-  sudo: yes
   # Update cache if older than 1 day
   apt: name={{ item }} state=latest update_cache=yes cache_valid_time=86400
   with_items:
@@ -23,13 +22,11 @@
 ######################################################################
 
 - name: Make sure wanted locales are present
-  sudo: yes
   locale_gen: name="{{ item }}" state=present
   with_items: "{{ locale | default('en_US.UTF-8') }}"
   tags: locale
 
 - name: Set default Locale and Language
-  sudo: yes
   lineinfile: line='export {{ item[0] }}="{{ item[1] }}"'
               regexp='^export {{ item[0] }}='
               dest=/etc/profile
@@ -44,7 +41,6 @@
 ######################################################################
 
 - name: be sure ntp is running and enabled
-  sudo: yes
   service: name=ntp state=running enabled=yes
   tags: time
 
@@ -53,7 +49,6 @@
 ######################################################################
 
 - name: Set timezone
-  sudo: yes
   lineinfile: line='{{ timezone | default('Etc/UTC') }}'
               regexp='^.*$'
               dest=/etc/timezone
@@ -66,16 +61,19 @@
 ######################################################################
 
 - name: Bash aliases
+  sudo: no
   lineinfile: dest="~/.bashrc" state=present line="{{ item }}"
   with_items:
     - "alias l='ls --color=auto -F -al'"
     - "alias v=vim"
 
 - name: Checkout Vundle from Github
+  sudo: no
   git: repo=https://github.com/gmarik/Vundle.vim.git
        dest="~/.vim/bundle/Vundle.vim"
 
 - name: Vim configuration
+  sudo: no
   lineinfile: dest="~/.vimrc" state=present line="{{ item }}" create=yes
   with_items:
     - "set nocompatible"
@@ -91,6 +89,7 @@
     - "set ic"
 
 - name: Vim install plugins
+  sudo: no
   command: vim +PluginInstall +qall
   changed_when: false
 
@@ -99,19 +98,20 @@
 #=====================================================================
 
 - name: Checkout Liquidprompt from Github
-  sudo: yes
   git: repo=https://github.com/nojhan/liquidprompt.git
        dest=/opt/liquidprompt
   tags: liquidprompt
 
 # Current user
 - name: Enable Liquidprompt (for current user)
+  sudo: no
   lineinfile: line="source /opt/liquidprompt/liquidprompt"
               dest="~/.bashrc"
               state=present
   tags: liquidprompt
 
 - name: Configure Liquidprompt (for current user)
+  sudo: no
   copy: src="{{ item }}" dest="~/.{{ item }}"
   with_items:
     - liquidpromptrc
@@ -120,14 +120,12 @@
 
 # Root user (through sudo)
 - name: Enable Liquidprompt (for root user)
-  sudo: yes
   lineinfile: line="source /opt/liquidprompt/liquidprompt"
               dest="~/.bashrc"
               state=present
   tags: liquidprompt
 
 - name: Configure Liquidprompt (for root user)
-  sudo: yes
   copy: src="{{ item }}" dest="~/.{{ item }}"
   with_items:
     - liquidpromptrc
