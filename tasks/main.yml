@@ -61,55 +61,71 @@
 # Shell configuration
 ######################################################################
 
+# FIXME: AWFUL HACK: In order to modify current {{ ansible_ssh_user }}'s own
+# $HOME files, I didn't find a better solution than using the $PWD which is
+# still set to /home/deploy even during sudo. :-(
+
 - name: Bash aliases
-  sudo: no
-  lineinfile: dest="~/.bashrc" state=present line="{{ item }}"
-  with_items:
-    - "alias l='ls --color=auto -F -al'"
-    - "alias v=vim"
+  lineinfile: dest="{{ item[0] }}/.bashrc" state=present
+              line="{{ item[1] }}"
+  with_nested:
+    - users_homes
+    - [
+      "alias l='ls --color=auto -F -al'",
+      "alias v=vim",
+      ]
 
 - name: Checkout Vundle from Github
-  sudo: no
   git: repo=https://github.com/gmarik/Vundle.vim.git
-       dest="~/.vim/bundle/Vundle.vim"
+       dest="{{ item }}/.vim/bundle/Vundle.vim"
+  with_items:
+    - "{{ users_homes }}"
   when: vim_vundle == true
 
 - name: Vim configuration
-  sudo: no
-  lineinfile: dest="~/.vimrc" state=present line="{{ item }}" create=yes
-  with_items:
-    - "set nocompatible"
-    - "set hlsearch"
-    - "set ignorecase"
-    - "set smarcase"
-    - "set showmatch"
-    - "set number"
-    - "set list"
-    - "set smartindent"
-    - "set tabstop=4"
-    - "set softtabstop=4"
-    - "set shiftwidth=4"
-    - "set exapandtab"
-    - "set autoindent"
-    - "set nojoinspaces"
-    - "set mouse=a"
-    - "set hidden"
+  lineinfile: dest="{{ item[0] }}/.vimrc" state=present
+              line="{{ item[1] }}" create=yes
+  with_nested:
+    - users_homes
+    - [
+      "set nocompatible",
+      "set hlsearch",
+      "set ignorecase",
+      "set smarcase",
+      "set showmatch",
+      "set number",
+      "set list",
+      "set smartindent",
+      "set tabstop=4",
+      "set softtabstop=4",
+      "set shiftwidth=4",
+      "set exapandtab",
+      "set autoindent",
+      "set nojoinspaces",
+      "set mouse=a",
+      "set hidden",
+      ]
 
 - name: Vim Vundle configuration
-  lineinfile: dest="~/.vimrc" state=present line="{{ item }}" create=yes
-  with_items:
-    - "filetype off"
-    - "set rtp+=~/.vim/bundle/Vundle.vim"
-    - "call vundle#begin()"
-    - "Plugin 'gmarik/Vundle.vim'"
-    - "Plugin 'tpope/vim-sensible'"
-    - "call vundle#end()"
-    - "filetype plugin indent on"
+  lineinfile: dest="{{ item[0] }}/.vimrc" state=present
+              line="{{ item[1] }}" create=yes
+  with_nested:
+    - users_homes
+    - [
+      "filetype off",
+      "set rtp+=~/.vim/bundle/Vundle.vim",
+      "call vundle#begin()",
+      "Plugin 'gmarik/Vundle.vim'",
+      "Plugin 'tpope/vim-sensible'",
+      "call vundle#end()",
+      "filetype plugin indent on",
+      ]
   when: vim_vundle == true
 
 - name: Vim install plugins
-  sudo: no
-  command: vim +PluginInstall +qall
+  command: su -c "vim +PluginInstall +qall" {{ item }}
+  with_items:
+    - "{{ users_list }}"
   changed_when: false
   when: vim_vundle == true
 
@@ -124,36 +140,23 @@
   tags: liquidprompt
 
 # Current user
-- name: Enable Liquidprompt (for current user)
-  sudo: no
+- name: Enable Liquidprompt
   lineinfile: line="source /opt/liquidprompt/liquidprompt"
-              dest="~/.bashrc"
+              dest="{{ item }}/.bashrc"
               state=present
-  when: liquidprompt == true
-  tags: liquidprompt
-
-- name: Configure Liquidprompt (for current user)
-  sudo: no
-  copy: src="{{ item }}" dest="~/.{{ item }}"
   with_items:
-    - liquidpromptrc
-    - liquid.theme
+    - "{{ users_homes }}"
   when: liquidprompt == true
   tags: liquidprompt
 
-# Root user (through sudo)
-- name: Enable Liquidprompt (for root user)
-  lineinfile: line="source /opt/liquidprompt/liquidprompt"
-              dest="~/.bashrc"
-              state=present
-  when: liquidprompt == true
-  tags: liquidprompt
-
-- name: Configure Liquidprompt (for root user)
-  copy: src="{{ item }}" dest="~/.{{ item }}"
-  with_items:
-    - liquidpromptrc
-    - liquid.theme
+- name: Configure Liquidprompt
+  copy: src="{{ item[1] }}" dest="{{ item[0] }}/.{{ item[1] }}"
+  with_nested:
+    - users_homes
+    - [
+      "liquidpromptrc",
+      "liquid.theme",
+      ]
   when: liquidprompt == true
   tags: liquidprompt
 
