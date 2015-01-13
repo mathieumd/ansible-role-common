@@ -91,19 +91,21 @@
       "set nocompatible",
       "set hlsearch",
       "set ignorecase",
-      "set smarcase",
+      "set smartcase",
       "set showmatch",
       "set number",
       "set list",
+      "set listchars=tab:>-,trail:-,nbsp:%",
       "set smartindent",
       "set tabstop=4",
       "set softtabstop=4",
       "set shiftwidth=4",
-      "set exapandtab",
+      "set expandtab",
       "set autoindent",
       "set nojoinspaces",
       "set mouse=a",
       "set hidden",
+      "color elflord",
       ]
 
 - name: Vim Vundle configuration
