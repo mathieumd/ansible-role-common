@@ -8,13 +8,13 @@
 #   - name: root
 #     home: /root
 #   - name: "{{ ansible_env['SUDO_USER'] }}"
-#     home: "{{ ansible_env['PWD'] }}"
+#     home: "XXX"
 
 users_list:
   - "{{ ansible_env['SUDO_USER'] }}"
   - "root"
 users_homes:
-  - "{{ ansible_env['PWD'] }}"
+  - "~{{ ansible_env['SUDO_USER'] }}"
   - "/root"
 
 # List of locales wanted
