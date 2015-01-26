@@ -22,6 +22,9 @@ locale:
   - "en_US.UTF-8"
   - "fr_FR.UTF-8"
 
+# Fix for https://github.com/ansible/ansible/issues/7289
+locales_gen_file: "{{ '/var/lib/locales/supported.d/local' if ansible_distribution == 'Ubuntu' else '/etc/locale.gen' }}"
+
 # The default timezone of the system
 timezone: "Etc/UTC"
 
