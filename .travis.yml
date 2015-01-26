@@ -9,7 +9,10 @@ env:
 
 before_install:
   # Make sure everything's up to date.
-  - sudo apt-get update -qq
+  - sudo apt-get update
+  # Build may fail because of locale
+  # http://docs.travis-ci.com/user/common-build-problems/#System%3A-Required-language-pack-isn%27t-installed
+  - apt-get --reinstall install -qq language-pack-en language-pack-fr
 
 install:
   # Install Ansible.
