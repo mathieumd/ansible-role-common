@@ -1,13 +1,29 @@
 ---
 # defaults file for common
 
+# List of users and their homes where various session files (.bashrc, .vimrc)
+# will be modified
+# FIXME: Try this instead of two variables
+# users:
+#   - name: root
+#     home: /root
+#   - name: "{{ ansible_env['SUDO_USER'] }}"
+#     home: "{{ ansible_env['PWD'] }}"
+
+users_list:
+  - "{{ ansible_env['SUDO_USER'] }}"
+  - "root"
+users_homes:
+  - "{{ ansible_env['PWD'] }}"
+  - "/root"
+
 # List of locales wanted
 locale:
-  - 'en_US.UTF-8'
-  - 'fr_FR.UTF-8'
+  - "en_US.UTF-8"
+  - "fr_FR.UTF-8"
 
 # The default timezone of the system
-timezone: 'Etc/UTC'
+timezone: "Etc/UTC"
 
 # Shall we setup Vim's Vundle?
 vim_vundle: false
