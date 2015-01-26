@@ -1,0 +1,8 @@
+---
+- hosts: localhost
+  #remote_user: travis
+  remote_user: root
+  roles:
+    - ansible-role-common
+
+# vim: ft=ansible
