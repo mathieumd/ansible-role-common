@@ -1,6 +1,8 @@
 Common
 =========
 
+[![Build Status](https://travis-ci.org/mathieumd/ansible-role-common.svg?branch=master)](https://travis-ci.org/mathieumd/ansible-role-common)
+
 Ansible role used to set the default settings common on all my machines.
 
 Role Variables
