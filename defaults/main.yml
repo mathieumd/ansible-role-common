@@ -11,10 +11,10 @@
 #     home: "XXX"
 
 users_list:
-  - "{{ ansible_env['SUDO_USER'] }}"
+  - "{{ ansible_env['SUDO_USER'] | default(ansible_env['LOGNAME']) }}"
   - "root"
 users_homes:
-  - "~{{ ansible_env['SUDO_USER'] }}"
+  - "~{{ ansible_env['SUDO_USER'] | default(ansible_env['LOGNAME']) }}"
   - "/root"
 
 # List of locales wanted
