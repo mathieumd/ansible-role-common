@@ -1,0 +1,7 @@
+---
+- hosts: common
+  remote_user: vagrant
+  roles:
+      - ../../ansible-role-common
+
+# vim: ft=ansible

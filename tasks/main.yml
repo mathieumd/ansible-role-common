@@ -1,22 +1,23 @@
 ---
-# tasks file for common
-
 ######################################################################
 # Base packages
 ######################################################################
 
+# Update cache if older than 1 day (86400s)
 - name: Make sure base packages are installed
-  # Update cache if older than 1 day
-  apt: name={{ item }} state=latest update_cache=yes cache_valid_time=86400
-  with_items:
-    - ntp
-    - locales
-    - tzdata
-    - vim
-    - screen
-    - htop
-    - git
-  tags: packages
+  apt: name={{ item }} state={{ packages_state }}
+       update_cache=yes cache_valid_time=86400
+  with_items: common_packages
+  tags:
+    - common
+    - packages
+
+- name: Make sure unwanted packages are removed
+  apt: name={{ item }} state=absent
+  with_items: common_packages_removed
+  tags:
+    - common
+    - packages
 
 ######################################################################
 # Locale
@@ -26,20 +27,25 @@
 - name: Detect locales.gen file
   stat: path="{{ locales_gen_file }}"
   register: locales_gen_file_stats
-  tags: locale
+  tags:
+    - common
+    - locale
 
 # Fix for https://github.com/ansible/ansible/issues/7289
 - name: Create locale.gen file
   file: path="{{ locales_gen_file }}" state=touch
   when: not locales_gen_file_stats.stat.exists
-  tags: locale
+  tags:
+    - common
+    - locale
 
 - name: Make sure wanted locales are present
   locale_gen: name="{{ item }}" state=present
-  with_items: "{{ locale | default('en_US.UTF-8') }}"
-  tags: locale
+  with_items: "{{ locales_list | default('en_US.UTF-8') }}"
+  tags:
+    - common
+    - locale
 
-# FIXME "locale[0]" would be "e" (for "en_US") if variable is not a list!
 - name: Set default Locale and Language
   lineinfile: line='export {{ item[0] }}="{{ item[1] }}"'
               regexp='^export {{ item[0] }}='
@@ -47,8 +53,10 @@
               state=present create=yes
   with_nested:
     - [ 'LC_ALL', 'LANG' ]
-    - "{{ locale[0] | default('en_US.UTF-8') }}"
-  tags: locale
+    - "{{ locales_list[0] | default('en_US.UTF-8') }}"
+  tags:
+    - common
+    - locale
 
 ######################################################################
 # NTP
@@ -56,10 +64,12 @@
 
 - name: be sure ntp is running and enabled
   service: name=ntp state=running enabled=yes
-  tags: time
+  tags:
+    - common
+    - time
 
 ######################################################################
-# UTC Timezone
+# Timezone
 ######################################################################
 
 - name: Set timezone
@@ -68,81 +78,47 @@
               dest=/etc/timezone
               state=present create=yes
   notify: reconfigure tzdata
-  tags: time
+  tags:
+    - common
+    - time
 
 ######################################################################
 # Shell configuration
 ######################################################################
 
-# FIXME: AWFUL HACK: In order to modify current {{ ansible_ssh_user }}'s own
-# $HOME files, I didn't find a better solution than using the $PWD which is
-# still set to /home/deploy even during sudo. :-(
-
 - name: Bash aliases
-  lineinfile: dest="{{ item[0] }}/.bashrc" state=present
+  lineinfile: dest="{{ item[0].home }}/.bashrc" state=present
               line="{{ item[1] }}"
   with_nested:
-    - users_homes
+    - users
     - [
       "alias l='ls --color=auto -F -al'",
       "alias v=vim",
       ]
+  tags:
+    - common
+    - bash
 
-- name: Checkout Vundle from Github
-  git: repo=https://github.com/gmarik/Vundle.vim.git
-       dest="{{ item }}/.vim/bundle/Vundle.vim"
-  with_items:
-    - "{{ users_homes }}"
-  when: vim_vundle == true
+#=====================================================================
+# Vim
+#=====================================================================
 
 - name: Vim configuration
-  lineinfile: dest="{{ item[0] }}/.vimrc" state=present
+  lineinfile: dest="{{ item[0].home }}/.vimrc" state=present
               line="{{ item[1] }}" create=yes
+              owner="{{ item[0].name }}" group="{{ item[0].group | default(item[0].name) }}"
   with_nested:
-    - users_homes
+    - users
     - [
-      "set nocompatible",
-      "set hlsearch",
-      "set ignorecase",
-      "set smartcase",
-      "set showmatch",
-      "set number",
-      "set list",
-      "set listchars=tab:>-,trail:-,nbsp:%",
-      "set smartindent",
-      "set tabstop=4",
-      "set softtabstop=4",
-      "set shiftwidth=4",
-      "set expandtab",
-      "set autoindent",
-      "set nojoinspaces",
-      "set mouse=a",
-      "set hidden",
+      "set nocompatible hlsearch ignorecase smartcase showmatch",
+      "set number list listchars=tab:>-,trail:-,nbsp:%",
+      "set smartindent tabstop=4 softtabstop=4 shiftwidth=4 expandtab autoindent",
+      "set nojoinspaces mouse=a hidden",
       "color elflord",
       ]
-
-- name: Vim Vundle configuration
-  lineinfile: dest="{{ item[0] }}/.vimrc" state=present
-              line="{{ item[1] }}" create=yes
-  with_nested:
-    - users_homes
-    - [
-      "filetype off",
-      "set rtp+=~/.vim/bundle/Vundle.vim",
-      "call vundle#begin()",
-      "Plugin 'gmarik/Vundle.vim'",
-      "Plugin 'tpope/vim-sensible'",
-      "call vundle#end()",
-      "filetype plugin indent on",
-      ]
-  when: vim_vundle == true
-
-- name: Vim install plugins
-  command: su -c "vim +PluginInstall +qall" {{ item }}
-  with_items:
-    - "{{ users_list }}"
-  changed_when: false
-  when: vim_vundle == true
+  tags:
+    - common
+    - vim
 
 #=====================================================================
 # Liquidprompt
@@ -152,27 +128,32 @@
   git: repo=https://github.com/nojhan/liquidprompt.git
        dest=/opt/liquidprompt
   when: liquidprompt == true
-  tags: liquidprompt
+  tags:
+    - common
+    - liquidprompt
 
 # Current user
 - name: Enable Liquidprompt
   lineinfile: line="source /opt/liquidprompt/liquidprompt"
-              dest="{{ item }}/.bashrc"
-              state=present
-  with_items:
-    - "{{ users_homes }}"
+              dest="{{ item.home }}/.bashrc" state=present
+  with_items: users
   when: liquidprompt == true
-  tags: liquidprompt
+  tags:
+    - common
+    - liquidprompt
 
 - name: Configure Liquidprompt
-  copy: src="{{ item[1] }}" dest="{{ item[0] }}/.{{ item[1] }}"
+  copy: src="{{ item[1] }}" dest="{{ item[0].home }}/.{{ item[1] }}"
+        owner="{{ item[0].name }}" group="{{ item[0].group | default(item[0].name) }}"
   with_nested:
-    - users_homes
+    - users
     - [
       "liquidpromptrc",
       "liquid.theme",
       ]
   when: liquidprompt == true
-  tags: liquidprompt
+  tags:
+    - common
+    - liquidprompt
 
 # vim: ft=ansible

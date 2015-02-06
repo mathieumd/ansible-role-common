@@ -1,24 +1,32 @@
 ---
 # defaults file for common
 
-# List of users and their homes where various session files (.bashrc, .vimrc)
-# will be modified
-# FIXME: Try this instead of two variables
-# users:
-#   - name: root
-#     home: /root
-#   - name: "{{ ansible_env['SUDO_USER'] }}"
-#     home: "XXX"
+# When want to upgrade, set it to "latest"
+packages_state: present
 
-users_list:
-  - "{{ ansible_env['SUDO_USER'] }}"
-  - "root"
-users_homes:
-  - "~{{ ansible_env['SUDO_USER'] }}"
-  - "/root"
+common_packages:
+  - vim
+  - screen
+  - htop
+  - git
+  - ntp
+  - locales
+  - tzdata
 
-# List of locales wanted
-locale:
+common_packages_removed:
+
+# List of users and their homes.
+# Various session files (~/.bashrc, ~/.vimrc) will be created/modified.
+users:
+  - name: root
+    home: /root
+  - name: "{{ ansible_env['SUDO_USER'] }}"
+    home: "~{{ ansible_env['SUDO_USER'] }}"
+
+# List of locales to generate.
+# The default locale must be the first.
+# MUST be a list [a], not a string "a" ("locale[0]" become "e" otherwise)
+locales_list:
   - "en_US.UTF-8"
   - "fr_FR.UTF-8"
 
@@ -28,10 +36,7 @@ locales_gen_file: "{{ '/var/lib/locales/supported.d/local' if ansible_distributi
 # The default timezone of the system
 timezone: "Etc/UTC"
 
-# Shall we setup Vim's Vundle?
-vim_vundle: false
-
 # Shall we setup Liquidprompt?
-liquidprompt: true
+liquidprompt: yes
 
 # vim: ft=ansible
