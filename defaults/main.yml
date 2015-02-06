@@ -1,6 +1,4 @@
 ---
-# defaults file for common
-
 # When want to upgrade, set it to "latest"
 packages_state: present
 
@@ -20,8 +18,8 @@ common_packages_removed:
 users:
   - name: root
     home: /root
-  - name: "{{ ansible_env['SUDO_USER'] }}"
-    home: "~{{ ansible_env['SUDO_USER'] }}"
+  - name: "{{ ansible_env['SUDO_USER'] | default(ansible_env['LOGNAME']) }}"
+    home: "~{{ ansible_env['SUDO_USER'] | default(ansible_env['LOGNAME']) }}"
 
 # List of locales to generate.
 # The default locale must be the first.
