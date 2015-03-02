@@ -3,15 +3,24 @@
 packages_state: present
 
 common_packages:
-  - vim
-  - screen
-  - htop
-  - git
-  - ntp
-  - locales
-  - tzdata
+  debian:
+    - vim
+    - screen
+    - htop
+    - git
+    - ntp
+    - locales
+    - tzdata
+  redhat:
+    - vim
+    - screen
+    - git
+    - ntp
+    - tzdata
 
 common_packages_removed:
+  debian:
+  redhat:
 
 # List of users and their homes.
 # Various session files (~/.bashrc, ~/.vimrc) will be created/modified.
