@@ -4,7 +4,7 @@
 ######################################################################
 
 # Update cache if older than 1 day (86400s)
-- name: Make sure base packages are installed
+- name: Make sure base packages are installed (Debian)
   apt: name={{ item }} state={{ packages_state }}
        update_cache=yes cache_valid_time=86400
   with_items: common_packages.debian
@@ -13,7 +13,7 @@
     - common
     - packages
 
-- name: Make sure base packages are installed
+- name: Make sure base packages are installed (Red Hat)
   yum: name={{ item }} state={{ packages_state }}
   with_items: common_packages.redhat
   when: ansible_os_family == 'RedHat'
@@ -21,7 +21,7 @@
     - common
     - packages
 
-- name: Make sure unwanted packages are removed
+- name: Make sure unwanted packages are removed (Debian)
   apt: name={{ item }} state=absent
   with_items: common_packages_removed.debian
   when: ansible_os_family == 'Debian'
@@ -29,7 +29,7 @@
     - common
     - packages
 
-- name: Make sure unwanted packages are removed
+- name: Make sure unwanted packages are removed (Red Hat)
   yum: name={{ item }} state=absent
   with_items: common_packages_removed.redhat
   when: ansible_os_family == 'RedHat'
@@ -78,14 +78,14 @@
 # NTP
 ######################################################################
 
-- name: be sure ntp is running and enabled
+- name: be sure ntp is running and enabled (Debian)
   service: name=ntp state=started enabled=yes
   when: ansible_os_family == 'Debian'
   tags:
     - common
     - time
 
-- name: be sure ntp is running and enabled
+- name: be sure ntp is running and enabled (Red Hat)
   service: name=ntpd state=started enabled=yes
   when: ansible_os_family == 'RedHat'
   tags:
@@ -96,7 +96,7 @@
 # Timezone
 ######################################################################
 
-- name: Set timezone
+- name: Set timezone (Debian)
   lineinfile: line='{{ timezone | default('Etc/UTC') }}'
               regexp='^.*$'
               dest=/etc/timezone
@@ -107,7 +107,7 @@
     - common
     - time
 
-- name: Set timezone
+- name: Set timezone (Red Hat)
   file: src="/usr/share/zoneinfo/{{ timezone | default('Etc/UTC') }}"
         dest="/etc/localtime"
         state=link force=yes
