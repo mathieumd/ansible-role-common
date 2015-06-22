@@ -6,7 +6,7 @@
 # Special characters
 # Be sure to use characters that exists in the font you use. You can use several
 # characters at once.
-# Below is an example of how to fallback to ascii if the term is not unicode capable.
+# Below is an example of how to fallback to ASCII if the term is not Unicode-capable.
 # Defaults to UTF-8 characters.
 if [[ "$(locale -k LC_CTYPE | sed -n 's/^charmap="\(.*\)"/\1/p')" == *"UTF-8"* ]]; then
     # If charset is UTF-8.
@@ -34,9 +34,10 @@ else
     LP_MARK_SVN="="
     LP_MARK_GIT="+"
     LP_MARK_FOSSIL="f"
+    LP_MARK_DISABLED="!"
     LP_MARK_UNTRACKED="*"
     LP_MARK_STASH="+"
-    LP_MARK_SHORTEN_PATH="..."
+    LP_MARK_SHORTEN_PATH=" ... "
 fi
 
 LP_MARK_BRACKET_OPEN="["  # open bracket
@@ -72,6 +73,7 @@ LP_COLOR_ERR="$PURPLE"
 # Prompt mark
 LP_COLOR_MARK="$BOLD"     # as user
 LP_COLOR_MARK_ROOT="$BOLD_RED"  # as root
+LP_COLOR_MARK_SUDO="$BOLD_RED"  # when sudo credentials are cached
 
 # Current user
 LP_COLOR_USER_LOGGED=""           # user who logged in
@@ -82,7 +84,7 @@ LP_COLOR_USER_ROOT="$BOLD_YELLOW" # root
 LP_COLOR_HOST=""            # local host
 LP_COLOR_SSH="$BLUE"        # connected via SSH
 LP_COLOR_SU="$BOLD_YELLOW"  # connected remotely but in new environment through su/sudo
-LP_COLOR_TELNET="$WARN_RED" # connected via telnet
+LP_COLOR_TELNET="" # connected via telnet -- Or via tmux!
 LP_COLOR_X11_ON="$GREEN"    # connected with X11 support
 LP_COLOR_X11_OFF="$YELLOW"  # connected without X11 support
 
@@ -127,4 +129,4 @@ LP_COLORMAP_7="$WARN_RED"
 LP_COLORMAP_8="$CRIT_RED"
 LP_COLORMAP_9="$DANGER_RED"
 
-# vim: et sts=4 sw=4 tw=120 ft=sh
+# vim: set et sts=4 sw=4 tw=120 ft=sh:
