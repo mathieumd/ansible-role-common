@@ -1,12 +1,26 @@
 Vagrant.configure("2") do |config|
-  config.vm.box = "ubuntu/trusty64"
-  config.vm.define "common"
-  config.vm.hostname = "common.example.test"
-  config.vm.network "public_network", bridge: "eth0"
-  config.vm.provision "ansible" do |a|
+
+  config.vm.define "test-common-ubuntu" do |node|
+    node.vm.box = "ubuntu/trusty64"
+    node.vm.hostname = "test-common-ubuntu.example.test"
+    node.vm.network "public_network", bridge: "eth0"
+
+    node.vm.provision "ansible" do |a|
       a.playbook = "test-vagrant.yml"
       a.sudo = true
-      a.limit = "all"
+    end
   end
+
+  config.vm.define "test-common-centos" do |node|
+    node.vm.box = "chef/centos-6.6"
+    node.vm.hostname = "test-common-centos.example.test"
+    node.vm.network "public_network", bridge: "eth0"
+
+    node.vm.provision "ansible" do |a|
+      a.playbook = "test-vagrant.yml"
+      a.sudo = true
+    end
+  end
+
 end
 # vim: ft=ruby

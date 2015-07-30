@@ -1,4 +1,24 @@
 ---
+
+######################################################################
+# Overloading depending roles' defaults
+######################################################################
+
+# NTP servers
+ntp_config_server: [ 0.fr.pool.ntp.org, 1.fr.pool.ntp.org, 2.fr.pool.ntp.org 3.fr.pool.ntp.org]
+
+# The default timezone of the system
+timezone_timezone: "UTC"
+
+# Locales
+locale_locales:
+  - en_US.UTF-8
+  - fr_FR.UTF-8
+
+######################################################################
+# This role's defaults
+######################################################################
+
 # When want to upgrade, set it to "latest"
 packages_state: present
 
@@ -8,15 +28,10 @@ common_packages:
     - screen
     - htop
     - git
-    - ntp
-    - locales
-    - tzdata
   redhat:
     - vim
     - screen
     - git
-    - ntp
-    - tzdata
 
 common_packages_removed:
   debian:
@@ -29,21 +44,6 @@ users:
     home: /root
   - name: "{{ ansible_env['SUDO_USER'] | default(ansible_env['LOGNAME']) }}"
     home: "~{{ ansible_env['SUDO_USER'] | default(ansible_env['LOGNAME']) }}"
-
-# List of locales to generate.
-# The default locale must be the first.
-# MUST be a list [a], not a string "a" ("locale[0]" become "e" otherwise)
-locales_list:
-  - "en_US.utf8"
-  - "fr_FR.utf8"
-  #- "en_US.UTF-8"
-  #- "fr_FR.UTF-8"
-
-# Fix for https://github.com/ansible/ansible/issues/7289
-locales_gen_file: "{{ '/var/lib/locales/supported.d/local' if ansible_distribution == 'Ubuntu' else '/etc/locale.gen' }}"
-
-# The default timezone of the system
-timezone: "Etc/UTC"
 
 # Shall we setup Liquidprompt?
 liquidprompt: yes

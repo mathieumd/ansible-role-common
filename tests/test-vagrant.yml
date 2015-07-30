@@ -1,5 +1,5 @@
 ---
-- hosts: common
+- hosts: all
   remote_user: vagrant
   roles:
       - ../../ansible-role-common

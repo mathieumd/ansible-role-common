@@ -3,118 +3,15 @@
 # Base packages
 ######################################################################
 
-# Update cache if older than 1 day (86400s)
-- name: Make sure base packages are installed (Debian)
-  apt: name={{ item }} state={{ packages_state }}
-       update_cache=yes cache_valid_time=86400
-  with_items: common_packages.debian
+- include: Debian.yml
   when: ansible_os_family == 'Debian'
   tags:
-    - common
     - packages
 
-- name: Make sure base packages are installed (Red Hat)
-  yum: name={{ item }} state={{ packages_state }}
-  with_items: common_packages.redhat
+- include: RedHat.yml
   when: ansible_os_family == 'RedHat'
   tags:
-    - common
     - packages
-
-- name: Make sure unwanted packages are removed (Debian)
-  apt: name={{ item }} state=absent
-  with_items: common_packages_removed.debian
-  when: ansible_os_family == 'Debian'
-  tags:
-    - common
-    - packages
-
-- name: Make sure unwanted packages are removed (Red Hat)
-  yum: name={{ item }} state=absent
-  with_items: common_packages_removed.redhat
-  when: ansible_os_family == 'RedHat'
-  tags:
-    - common
-    - packages
-
-######################################################################
-# Locale
-######################################################################
-
-# Fix for https://github.com/ansible/ansible/issues/7289
-- name: Detect locales.gen file
-  stat: path="{{ locales_gen_file }}"
-  register: locales_gen_file_stats
-  tags:
-    - common
-    - locale
-- name: Create locale.gen file
-  file: path="{{ locales_gen_file }}" state=touch
-  when: not locales_gen_file_stats.stat.exists
-  tags:
-    - common
-    - locale
-
-- name: Make sure wanted locales are present
-  locale_gen: name="{{ item }}" state=present
-  with_items: "{{ locales_list | default('en_US.utf8') }}"
-  tags:
-    - common
-    - locale
-
-- name: Set default Locale and Language
-  lineinfile: line='export {{ item[0] }}="{{ item[1] }}"'
-              regexp='^export {{ item[0] }}='
-              dest=/etc/profile.d/custom_locale.sh
-              state=present create=yes
-  with_nested:
-    - [ 'LC_ALL', 'LANG' ]
-    - "{{ locales_list[0] | default('en_US.utf8') }}"
-  tags:
-    - common
-    - locale
-
-######################################################################
-# NTP
-######################################################################
-
-- name: be sure ntp is running and enabled (Debian)
-  service: name=ntp state=started enabled=yes
-  when: ansible_os_family == 'Debian'
-  tags:
-    - common
-    - time
-
-- name: be sure ntp is running and enabled (Red Hat)
-  service: name=ntpd state=started enabled=yes
-  when: ansible_os_family == 'RedHat'
-  tags:
-    - common
-    - time
-
-######################################################################
-# Timezone
-######################################################################
-
-- name: Set timezone (Debian)
-  lineinfile: line='{{ timezone | default('Etc/UTC') }}'
-              regexp='^.*$'
-              dest=/etc/timezone
-              state=present create=yes
-  notify: reconfigure tzdata
-  when: ansible_os_family == 'Debian'
-  tags:
-    - common
-    - time
-
-- name: Set timezone (Red Hat)
-  file: src="/usr/share/zoneinfo/{{ timezone | default('Etc/UTC') }}"
-        dest="/etc/localtime"
-        state=link force=yes
-  when: ansible_os_family == 'RedHat'
-  tags:
-    - common
-    - time
 
 ######################################################################
 # Shell configuration

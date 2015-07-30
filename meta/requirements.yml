@@ -1,0 +1,15 @@
+---
+# NOTE: Don't forget to add them to meta/main.yml too.
+
+# NTP
+# https://galaxy.ansible.com/list#/roles/191
+- src: resmo.ntp
+
+# Timezone
+# https://galaxy.ansible.com/list#/roles/909
+- src: Stouts.timezone
+
+# Locale
+# https://galaxy.ansible.com/list#/roles/828
+- src: Stouts.locale
+
