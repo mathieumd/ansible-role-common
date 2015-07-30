@@ -34,8 +34,10 @@ users:
 # The default locale must be the first.
 # MUST be a list [a], not a string "a" ("locale[0]" become "e" otherwise)
 locales_list:
-  - "en_US.UTF-8"
-  - "fr_FR.UTF-8"
+  - "en_US.utf8"
+  - "fr_FR.utf8"
+  #- "en_US.UTF-8"
+  #- "fr_FR.UTF-8"
 
 # Fix for https://github.com/ansible/ansible/issues/7289
 locales_gen_file: "{{ '/var/lib/locales/supported.d/local' if ansible_distribution == 'Ubuntu' else '/etc/locale.gen' }}"

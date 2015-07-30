@@ -57,7 +57,7 @@
 
 - name: Make sure wanted locales are present
   locale_gen: name="{{ item }}" state=present
-  with_items: "{{ locales_list | default('en_US.UTF-8') }}"
+  with_items: "{{ locales_list | default('en_US.utf8') }}"
   tags:
     - common
     - locale
@@ -65,11 +65,12 @@
 - name: Set default Locale and Language
   lineinfile: line='export {{ item[0] }}="{{ item[1] }}"'
               regexp='^export {{ item[0] }}='
-              dest=/etc/profile
+              #dest=/etc/profile
+              dest=/etc/profile.d/custom_locale.sh
               state=present create=yes
   with_nested:
     - [ 'LC_ALL', 'LANG' ]
-    - "{{ locales_list[0] | default('en_US.UTF-8') }}"
+    - "{{ locales_list[0] | default('en_US.utf8') }}"
   tags:
     - common
     - locale
