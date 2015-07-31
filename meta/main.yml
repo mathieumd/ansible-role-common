@@ -1,8 +1,7 @@
 ---
-
-# NOTE: Don't forget to add them to meta/requirements.yml too.
+# NOTE: Don't forget to add them to meta/requirements.txt too.
 dependencies:
-  - { role: resmo.ntp }
-  - { role: Stouts.timezone }
-  - { role: Stouts.locale }
+  - { role: ntp }
+  - { role: timezone }
+  - { role: locale }
 
