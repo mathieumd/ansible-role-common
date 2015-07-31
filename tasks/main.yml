@@ -3,12 +3,32 @@
 # Base packages
 ######################################################################
 
-- include: Debian.yml
+# Update cache if older than 1 day (86400s)
+- name: Make sure base packages are installed
+  apt: name={{ item }} state={{ packages_state }}
+       update_cache=yes cache_valid_time=86400
+  with_items: common_packages.debian
   when: ansible_os_family == 'Debian'
   tags:
     - packages
 
-- include: RedHat.yml
+- name: Make sure unwanted packages are removed
+  apt: name={{ item }} state=absent
+  with_items: common_packages_removed.debian
+  when: ansible_os_family == 'Debian'
+  tags:
+    - packages
+
+- name: Make sure base packages are installed
+  yum: name={{ item }} state={{ packages_state }}
+  with_items: common_packages.redhat
+  when: ansible_os_family == 'RedHat'
+  tags:
+    - packages
+
+- name: Make sure unwanted packages are removed
+  yum: name={{ item }} state=absent
+  with_items: common_packages_removed.redhat
   when: ansible_os_family == 'RedHat'
   tags:
     - packages
