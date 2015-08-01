@@ -8,7 +8,7 @@
 ntp_config_server: [ 0.fr.pool.ntp.org, 1.fr.pool.ntp.org, 2.fr.pool.ntp.org 3.fr.pool.ntp.org]
 
 # The default timezone of the system
-timezone_timezone: "UTC"
+timezone: "UTC"
 
 # Locales
 locale_locales:
@@ -18,6 +18,10 @@ locale_locales:
 ######################################################################
 # This role's defaults
 ######################################################################
+
+#=====================================================================
+# Packages
+#=====================================================================
 
 # When want to upgrade, set it to "latest"
 packages_state: present
@@ -37,6 +41,13 @@ common_packages_removed:
   debian:
   redhat:
 
+# Retrieve and setup Liquidprompt:
+liquidprompt: yes
+
+#=====================================================================
+# Users
+#=====================================================================
+
 # List of users and their homes.
 # Various session files (~/.bashrc, ~/.vimrc) will be created/modified.
 users:
@@ -44,8 +55,5 @@ users:
     home: /root
   - name: "{{ ansible_env['SUDO_USER'] | default(ansible_env['LOGNAME']) }}"
     home: "~{{ ansible_env['SUDO_USER'] | default(ansible_env['LOGNAME']) }}"
-
-# Shall we setup Liquidprompt?
-liquidprompt: yes
 
 # vim: ft=ansible
