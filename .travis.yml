@@ -19,7 +19,7 @@ install:
   # Install Ansible.
   - pip install ansible
   # Setup roles path
-  - "sed 's#.*roles_path\s*=#roles_path = ../#' $ANSIBLE_CONFIG"
+  - "sed -i 's#.*roles_path.*#roles_path = ../#' $ANSIBLE_CONFIG"
   # Create the inventory
   - "echo localhost > $INVENTORY"
 
