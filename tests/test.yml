@@ -2,6 +2,6 @@
 # Same playbook for Vagrant and Travis.
 - hosts: all
   roles:
-      - ansible-role-common
+    - ansible-role-common
 
 # vim: ft=ansible
