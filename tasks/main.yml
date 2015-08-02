@@ -9,29 +9,30 @@
        update_cache=yes cache_valid_time=86400
   with_items: common_packages.debian
   when: ansible_os_family == 'Debian'
-  tags:
-    - packages
+  tags: [ common, packages ]
 
 - name: Make sure unwanted packages are removed
   apt: name={{ item }} state=absent
   with_items: common_packages_removed.debian
   when: ansible_os_family == 'Debian'
-  tags:
-    - packages
+  tags: [ common, packages ]
+
+- name: Install required packages for SELinux in Redhat derivatives
+  yum: name=libselinux-python state=present
+  when: ansible_os_family == 'RedHat'
+  tags: [ common, packages ]
 
 - name: Make sure base packages are installed
   yum: name={{ item }} state={{ packages_state }}
   with_items: common_packages.redhat
   when: ansible_os_family == 'RedHat'
-  tags:
-    - packages
+  tags: [ common, packages ]
 
 - name: Make sure unwanted packages are removed
   yum: name={{ item }} state=absent
   with_items: common_packages_removed.redhat
   when: ansible_os_family == 'RedHat'
-  tags:
-    - packages
+  tags: [ common, packages ]
 
 ######################################################################
 # Shell configuration
@@ -46,9 +47,7 @@
       "alias l='ls --color=auto -F -al'",
       "alias v=vim",
       ]
-  tags:
-    - common
-    - bash
+  tags: [ common, bash ]
 
 #=====================================================================
 # Vim
@@ -67,9 +66,7 @@
       "set nojoinspaces mouse=a hidden",
       "color elflord",
       ]
-  tags:
-    - common
-    - vim
+  tags: [ common, vim ]
 
 #=====================================================================
 # Liquidprompt
@@ -79,9 +76,7 @@
   git: repo=https://github.com/nojhan/liquidprompt.git
        dest=/opt/liquidprompt
   when: liquidprompt == true
-  tags:
-    - common
-    - liquidprompt
+  tags: [ common, liquidprompt ]
 
 # Current user
 - name: Enable Liquidprompt
@@ -89,9 +84,7 @@
               dest="{{ item.home }}/.bashrc" state=present
   with_items: users
   when: liquidprompt == true
-  tags:
-    - common
-    - liquidprompt
+  tags: [ common, liquidprompt ]
 
 - name: Configure Liquidprompt
   template: src="{{ item[1] }}" dest="{{ item[0].home }}/.{{ item[1] }}"
@@ -103,8 +96,6 @@
       "liquid.theme",
       ]
   when: liquidprompt == true
-  tags:
-    - common
-    - liquidprompt
+  tags: [ common, liquidprompt ]
 
 # vim: ft=ansible

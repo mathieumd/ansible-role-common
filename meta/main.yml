@@ -1,7 +1,0 @@
----
-# NOTE: Don't forget to add them to meta/requirements.txt too.
-dependencies:
-  - { role: ntp }
-  - { role: timezone }
-  - { role: locale }
-

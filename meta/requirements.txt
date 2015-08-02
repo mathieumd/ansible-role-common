@@ -1,4 +1,0 @@
-# NOTE: Don't forget to add them to meta/main.yml too.
-ntp       git@gitlab.com:MathieuMD/ansible-role-ntp.git
-timezone  git@gitlab.com:MathieuMD/ansible-role-timezone.git
-locale    git@gitlab.com:MathieuMD/ansible-role-locale.git

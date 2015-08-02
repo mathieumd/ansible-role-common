@@ -1,6 +1,5 @@
 ---
-- hosts: localhost
-  remote_user: travis
+- hosts: all
   roles:
     - ansible-role-common
 
