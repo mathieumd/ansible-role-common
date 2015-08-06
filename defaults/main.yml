@@ -16,6 +16,7 @@ common_packages:
   redhat:
     - vim
     - screen
+    - htop
     - git
 
 common_packages_removed:
