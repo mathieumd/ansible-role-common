@@ -3,6 +3,10 @@
 # Base packages
 ######################################################################
 
+#=====================================================================
+# Debian
+#=====================================================================
+
 # Update cache if older than 1 day (86400s)
 - name: Make sure base packages are installed
   apt: name={{ item }} state={{ packages_state }}
@@ -17,8 +21,20 @@
   when: ansible_os_family == 'Debian'
   tags: [ common, packages ]
 
-- name: Install required packages for SELinux in Redhat derivatives
+#=====================================================================
+# Red Hat
+#=====================================================================
+
+- name: Install required packages for SELinux in RedHat
   yum: name=libselinux-python state=present
+  when: ansible_os_family == 'RedHat'
+  tags: [ common, packages ]
+
+# EPEL is required for htop
+# FIXME To install EPEL on RHEL, the "optional" repo may be required:
+# https://fedoraproject.org/wiki/EPEL#How_can_I_use_these_extra_packages.3F
+- name: Install EPEL for RedHat
+  yum: name="https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm" state=present
   when: ansible_os_family == 'RedHat'
   tags: [ common, packages ]
 

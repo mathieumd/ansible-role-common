@@ -1,21 +1,22 @@
 #!/bin/bash
 
-# First, retrieve depending roles
-#ansible-galaxy --ignore-errors -p roles install -r ../meta/requirements.yml
-mkdir roles
-grep -vE "^(\s*$|#)" ../meta/requirements.txt | while read role repo; do
-    git clone "$repo" "roles/$role"
-done
+# Verify Ansible is available
+if ! which ansible-playbook >/dev/null; then
+    echo "You must first setup Ansible environment:"
+    echo "source ~/dev/ansible/hacking/env-setup"
+    exit 1
+fi
 
-# Then create VM
-vagrant up
+# Create VMs:
+vagrant up --no-provision
 
-# Provision them
-vagrant provision
+# Provision them:
+# NOTE: Force locale until this bug is fixed:
+# https://github.com/ansible/ansible/issues/11055
+LC_ALL=en_US.UTF-8 vagrant provision
 
-#ansible-playbook test-vagrant.yml -i inventory-vagrant --user vagrant --private-key=~/.vagrant.d/insecure_private_key --sudo
+# Manually:
+# MYHOST=centos-7
+# vagrant ssh-config $MYHOST > /tmp/ansible_ssh_temp
+# ANSIBLE_SSH_ARGS="-F /tmp/ansible_ssh_temp" ansible-playbook test.yml -i "$MYHOST," --sudo
 
-#echo 'Vagrant SSH password is "vagrant".'
-#ansible-playbook test-vagrant.yml -i inventory-vagrant --user vagrant -k --sudo
-
-rm -rf roles
