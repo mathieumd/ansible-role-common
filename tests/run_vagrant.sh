@@ -15,6 +15,9 @@ vagrant up --no-provision
 # https://github.com/ansible/ansible/issues/11055
 LC_ALL=en_US.UTF-8 vagrant provision
 
+# Run again to verify idempotence:
+LC_ALL=en_US.UTF-8 vagrant provision
+
 # Manually:
 # MYHOST=centos-7
 # vagrant ssh-config $MYHOST > /tmp/ansible_ssh_temp
