@@ -6,29 +6,39 @@ Personal Ansible role used to set the default settings common on my machines.
 
 ## Role Variables
 
-See [defaults](defaults/main.yml) contents.
-
-You probably want to overload some depending roles' variables in your playbook `group_vars/all`:
+See [defaults](defaults/main.yml) contents. Basicaly:
 
 ```yaml
-# NTP servers
-ntp_config_server: [ 0.fr.pool.ntp.org, 1.fr.pool.ntp.org, 2.fr.pool.ntp.org 3.fr.pool.ntp.org]
+# List of packages you want to be present or absent:
+common_packages:
+  debian:
+    - vim
+    - screen
+    - htop
+    - git
+  redhat:
+    - vim
+    - screen
+    - htop
+    - git
 
-# The default timezone of the system
-timezone: "Europe/Paris"
-
-# Locales
-locale_locales:
-  - en_US.UTF-8
-  - fr_FR.UTF-8
+common_packages_removed:
+  debian:
+  redhat:
 ```
 
 ## Example Playbook
 
 ```yaml
+- hosts: desktops
+  roles:
+    - role: common
+
 - hosts: servers
   roles:
-     - common
+    - role: common
+      liquidprompt: no
+      common_packages: { debian: [vim, htop], redhat: [vim, htop] }
 ```
 
 ## License
