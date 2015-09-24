@@ -31,11 +31,21 @@
   tags: [ common, packages ]
 
 # EPEL is required for htop
-# FIXME To install EPEL on RHEL, the "optional" repo may be required:
-# https://fedoraproject.org/wiki/EPEL#How_can_I_use_these_extra_packages.3F
+# NOTE: On production Red Hat supported machines, until absolutely necessary,
+# it's probably better not use unofficial repos.
+# https://access.redhat.com/solutions/410753?tour=6
 - name: Install EPEL for RedHat
-  yum: name="https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm" state=present
+  yum: name="https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm"
+       state=present
   when: ansible_os_family == 'RedHat'
+  tags: [ common, packages ]
+
+# NOTE: To install EPEL on RHEL, the "optional" repo may be required:
+# https://fedoraproject.org/wiki/EPEL#How_can_I_use_these_extra_packages.3F
+# TODO: Test and verify this enabling task on Red Hat and CentOS:
+- name: Enable RHEL Optional repo for RedHat (but not for CentOS)
+  yum: enable="rhel-{{ ansible_distribution_major_version }}-server-optional-rpms"
+  when: ansible_distribution == 'RedHat'
   tags: [ common, packages ]
 
 - name: Make sure base packages are installed
